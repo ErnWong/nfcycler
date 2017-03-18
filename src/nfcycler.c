@@ -13,7 +13,7 @@ const char * argp_program_bug_address = "Ernest Wong <ewon521@gmail.com>";
 
 static char doc[] = "nfcycler - executes your shell commands, and pipes its stdout back into its stdin";
 
-static char args_doc[] = "COMMAND";
+static char args_doc[] = "\"your | shell | command\"";
 
 static struct argp_option options[] =
 {
