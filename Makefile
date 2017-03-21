@@ -21,9 +21,9 @@ $(BIN): $(SRC) $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(BIN) $(OBJ)
+	rm -f $(BIN) $(OBJS)
 
-install:
+install: $(BIN)
 	install $(BIN) $(PREFIX)/bin
 
 uninstall:
