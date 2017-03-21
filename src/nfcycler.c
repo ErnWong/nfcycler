@@ -6,87 +6,26 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <signal.h>
-#include <argp.h>
+#include <string.h>
+#include "commander/commander.h"
 
-const char * argp_program_version = "nfcycler 0.0.0";
-const char * argp_program_bug_address = "Ernest Wong <ewon521@gmail.com>";
 
-static char doc[] = "nfcycler - executes your shell commands, and pipes its stdout back into its stdin";
+static bool gVerbose = false;
+static bool gQuiet = false;
+static bool gPrintPayload = false;
+static char * gChildCmd = "";
 
-static char args_doc[] = "\"your | shell | command\"";
+static pid_t childpid = 0;
 
-static struct argp_option options[] =
-{
-  {"quiet",         'q',  0,  0,            "Suppress all output", 0},
-  {"silent",        's',  0,  OPTION_ALIAS, 0, 0},
-  {"verbose",       'v',  0,  0,            "Produce verbose output", 0},
-  {"print-payload", 'p',  0,  0,            "Prints the data from the pipe to stdout", 0},
-  { 0 }
-};
 
-typedef struct
-Arguments
-{
-  char *args[1];
-  bool silent;
-  bool verbose;
-  bool printPayload;
-}
-Arguments;
-Arguments nfcyclerArgs =
-{
-  { "" },
-  false,
-  false,
-  false
-};
+#define CHILDCMD_LEN 262144
+#define FD_READ_END 0
+#define FD_WRITE_END 1
 
-static error_t
-parse_opt(int key, char * arg, struct argp_state * state)
-{
-  Arguments * arguments = state->input;
-
-  switch(key)
-  {
-  case 'q': case 's':
-    arguments->silent = true;
-  case 'v':
-    arguments->verbose = true;
-    break;
-  case 'p':
-    arguments->printPayload = true;
-    break;
-  case ARGP_KEY_ARG:
-    if (state->arg_num >= 1)
-    {
-      puts("Whoa! Too many arguments.");
-      argp_usage(state);
-    }
-    arguments->args[state->arg_num] = arg;
-    break;
-  case ARGP_KEY_END:
-    if (state->arg_num < 1)
-    {
-      puts("Missing the command argument");
-      argp_usage(state);
-    }
-    break;
-  default:
-    return ARGP_ERR_UNKNOWN;
-  }
-  return 0;
-}
-
-static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
-
-void parseArguments(int argc, char * argv[])
-{
-  argp_parse(&argp, argc, argv, 0, 0, &nfcyclerArgs);
-}
-
+#define UNUSED(x) (void)(x)
 #define ilog(...) \
   do { \
-    if (!nfcyclerArgs.silent) \
+    if (!gQuiet) \
     { \
       printf("[nfcycler] "); \
       printf(__VA_ARGS__); \
@@ -95,7 +34,7 @@ void parseArguments(int argc, char * argv[])
 
 #define dlog(...) \
   do { \
-    if (nfcyclerArgs.verbose) \
+    if (gVerbose) \
     { \
       printf("[nfcycler] "); \
       printf(__VA_ARGS__); \
@@ -104,18 +43,80 @@ void parseArguments(int argc, char * argv[])
 
 #define plog(...) \
   do { \
-    if (nfcyclerArgs.printPayload) \
+    if (gPrintPayload) \
     { \
       printf(__VA_ARGS__); \
       fflush(stdout); \
     } \
   } while (0)
 
-#define CHILDCMD_LEN 262144
-#define FD_READ_END 0
-#define FD_WRITE_END 1
+static void
+optUsage(command_t * cmd)
+{
+  UNUSED(cmd);
+  printf("Usage: nfcycler [-ipquvV] [--print-payload] [--quiet] [--verbose]\n");
+  printf("            [--help] [--usage] [--version] \"your | shell | command\"\n");
+  exit(0);
+}
 
-pid_t childpid = 0;
+static void
+optVerbose(command_t * cmd)
+{
+  UNUSED(cmd);
+  gVerbose = true;
+}
+
+static void
+optQuiet(command_t * cmd)
+{
+  UNUSED(cmd);
+  gQuiet = true;
+}
+
+static void
+optPrintPayload(command_t * cmd)
+{
+  UNUSED(cmd);
+  gPrintPayload = true;
+}
+
+static void
+optInit(command_t * cmd)
+{
+  UNUSED(cmd);
+  fprintf(stderr, "Sorry, --init is not supported yet\n");
+}
+
+
+void parseArguments(int argc, char * argv[])
+{
+  command_t cmd;
+  command_init(&cmd, "nfcycler", "0.0.1");
+  cmd.usage = "[options] <shell command>";
+  command_option(&cmd, "-u", "--usage", "give a short usage message", optUsage);
+  command_option(&cmd, "-v", "--verbose", "be crazy and log everything", optVerbose);
+  command_option(&cmd, "-q", "--quiet", "suppress informative logs", optQuiet);
+  command_option(&cmd, "-p", "--print-payload", "log the pipe's value real time", optPrintPayload);
+  command_option(&cmd, "-i", "--init [command]", "supply a payload initialisation command", optInit);
+  command_parse(&cmd, argc, argv);
+
+  if (1 > cmd.argc)
+  {
+    fprintf(stderr, "Missing shell command argument\n");
+    fprintf(stderr, "Try `nfcycler --help' or `nfcycler --usage' for more info\n");
+    exit(1);
+  }
+  else if (1 < cmd.argc)
+  {
+    fprintf(stderr, "Too many arguments\n");
+    fprintf(stderr, "Try `nfcycler --help' or `nfcycler --usage' for more info\n");
+    exit(1);
+  }
+  gChildCmd = malloc(strlen(cmd.argv[0]));
+  strcpy(gChildCmd, cmd.argv[0]);
+
+  command_free(&cmd);
+}
 
 void exitCleanup()
 {
@@ -165,7 +166,7 @@ int main(int argc, char * argv[])
   int fdtail[2];
   char buffer[128] = {0};
 
-  dlog("Received command: %s\n", nfcyclerArgs.args[0]);
+  dlog("Received command: %s\n", gChildCmd);
 
   pipe(fdhead);
   pipe(fdtail);
@@ -193,7 +194,7 @@ int main(int argc, char * argv[])
     close(fdhead[FD_READ_END]);
     close(fdtail[FD_WRITE_END]);
 
-    if (execl("/bin/sh", "/bin/sh", "-c", nfcyclerArgs.args[0], (char *)NULL) == -1)
+    if (execl("/bin/sh", "/bin/sh", "-c", gChildCmd, (char *)NULL) == -1)
       perror("child execl");
   }
   else
@@ -214,9 +215,7 @@ int main(int argc, char * argv[])
 
       dlog("Length: %d\n", len);
       dlog("Attempting to write: %s", buffer);
-      plog("-----------------------------\n");
       plog("%s", buffer);
-      plog("-----------------------------\n");
 
       if (write(fdhead[FD_WRITE_END], buffer, len) == -1)
         perror("Parent write");
