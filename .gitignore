@@ -1,3 +1,6 @@
 nfcycler
 examples/sequence
 *.o
+
+test/trash directory.*/
+test/test-results/

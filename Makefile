@@ -34,4 +34,7 @@ examples: $(OUT_EXAMPLES)
 examples/%: examples/%.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+test: all
+	$(MAKE) -C test
+
 .PHONEY: all clean install uninstall examples
