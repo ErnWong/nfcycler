@@ -20,7 +20,10 @@ test_expect_success 'should exit when child exits' "
       fi
       echo \"\$((line + 1))\"
     done' &
+  ps && echo \"\$!\" &&
   sleep 4 &&
+  echo \"after sleep\"
+  ps &&
   ! kill \"\$!\"
 "
 
@@ -34,12 +37,13 @@ test_expect_success '--quiet should not output anything' "
     done' &>should-be-empty &&
   test_line_count = 0 should-be-empty
 "
+
 test_expect_success 'this test should not hang' "
   echo \"hi. beginning the hang\" &&
   echo \"about to write seq 1000 > expected\" &&
   seq 1000 > expected &&
   echo \"about to start nfcycler\" &&
-  nfcycler --print-payload 'echo 1 &&
+  nfcycler --print-payload --verbose 'echo 1 &&
     while read line
     do
       if [ \"\$line\" -gt 999 ]; then
