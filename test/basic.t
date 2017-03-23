@@ -35,18 +35,18 @@ test_expect_success '--quiet should not output anything' "
   test_line_count = 0 should-be-empty
 "
 
-test_expect_success '--print-payload should stdout the right output' "
-  seq 1000 > expected &&
-  nfcycler --print-payload 'echo 1 &&
-    while read line
-    do
-      if [ \"\$line\" -gt 999 ]; then
-        exit 0
-      fi
-      echo \"\$((line + 1))\"
-    done' >actual &&
-  test_cmp actual expected
-"
+# test_expect_success '--print-payload should stdout the right output' "
+#   seq 1000 > expected &&
+#   nfcycler --print-payload 'echo 1 &&
+#     while read line
+#     do
+#       if [ \"\$line\" -gt 999 ]; then
+#         exit 0
+#       fi
+#       echo \"\$((line + 1))\"
+#     done' >actual &&
+#   test_cmp actual expected
+# "
 
 test_done
 
