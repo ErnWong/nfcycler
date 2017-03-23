@@ -1,5 +1,3 @@
-install:
-  - make install
-
+language: c
 script:
   - make test
