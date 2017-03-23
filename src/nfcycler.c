@@ -202,13 +202,16 @@ int main(int argc, char * argv[])
   else
   {
     dlog("Parent process is alive\n");
+    dlog("Child pid = %d\n", childpid);
 
     close(fdhead[FD_READ_END]);
     close(fdtail[FD_WRITE_END]);
 
     while (true)
     {
-      if (kill(childpid, 0) == -1)
+      int killoutput = kill(childpid, 0);
+      dlog("kill output = %d\n", killoutput);
+      if (killoutput == -1)
       {
         ilog("Child process ended\n");
         exit(0);
