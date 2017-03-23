@@ -179,7 +179,7 @@ int main(int argc, char * argv[])
   }
   if (childpid == 0)
   {
-    dlog("Hi from child\n");
+    dlog("Child process created\n");
 
     close(fdhead[FD_WRITE_END]);
     close(fdtail[FD_READ_END]);
@@ -201,7 +201,7 @@ int main(int argc, char * argv[])
   }
   else
   {
-    dlog("Hi from parent\n");
+    dlog("Parent process is alive\n");
 
     close(fdhead[FD_READ_END]);
     close(fdtail[FD_WRITE_END]);
