@@ -20,8 +20,8 @@ test_expect_success 'should exit when child exits' "
       fi
       echo \"\$((line + 1))\"
     done' &
-  sleep 1 &&
-  ! kill -0 \"\$!\"
+  sleep 4 &&
+  ! kill \"\$!\"
 "
 
 test_expect_success '--quiet should not output anything' "
