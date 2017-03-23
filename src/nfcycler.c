@@ -28,8 +28,8 @@ static pid_t childpid = 0;
   do { \
     if (!gQuiet) \
     { \
-      printf("[nfcycler] "); \
-      printf(__VA_ARGS__); \
+      fprintf(stderr, "[nfcycler] "); \
+      fprintf(stderr, __VA_ARGS__); \
     } \
   } while (0)
 
@@ -37,8 +37,8 @@ static pid_t childpid = 0;
   do { \
     if (gVerbose) \
     { \
-      printf("[nfcycler] "); \
-      printf(__VA_ARGS__); \
+      fprintf(stderr, "[nfcycler] "); \
+      fprintf(stderr, __VA_ARGS__); \
     } \
   } while (0)
 
