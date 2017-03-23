@@ -35,10 +35,10 @@ test_expect_success '--quiet should not output anything' "
   test_line_count = 0 should-be-empty
 "
 test_expect_success 'this test should not hang' "
-  echo "# hi. beginning the hang" &&
-  echo "about to write seq 1000 > expected" &&
+  echo \"hi. beginning the hang\" &&
+  echo \"about to write seq 1000 > expected\" &&
   seq 1000 > expected &&
-  echo "about to start nfcycler" &&
+  echo \"about to start nfcycler\" &&
   nfcycler --print-payload 'echo 1 &&
     while read line
     do
@@ -47,7 +47,7 @@ test_expect_success 'this test should not hang' "
       fi
       echo \"\$((line + 1))\"
     done' >actual &&
-  echo "about to test_cmp" &&
+  echo \"about to test_cmp\" &&
   test_cmp actual expected
 "
 
