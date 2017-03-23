@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <string.h>
+#include <sysexits.h>
 #include "commander/commander.h"
 
 
@@ -85,6 +86,7 @@ optInit(command_t * cmd)
 {
   UNUSED(cmd);
   fprintf(stderr, "Sorry, --init is not supported yet\n");
+  exit(EX_UNAVAILABLE);
 }
 
 
@@ -104,13 +106,13 @@ void parseArguments(int argc, char * argv[])
   {
     fprintf(stderr, "Missing shell command argument\n");
     fprintf(stderr, "Try `nfcycler --help' or `nfcycler --usage' for more info\n");
-    exit(1);
+    exit(EX_USAGE);
   }
   else if (1 < cmd.argc)
   {
     fprintf(stderr, "Too many arguments\n");
     fprintf(stderr, "Try `nfcycler --help' or `nfcycler --usage' for more info\n");
-    exit(1);
+    exit(EX_USAGE);
   }
   gChildCmd = malloc(strlen(cmd.argv[0]));
   strcpy(gChildCmd, cmd.argv[0]);
