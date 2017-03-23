@@ -208,6 +208,11 @@ int main(int argc, char * argv[])
 
     while (true)
     {
+      if (kill(childpid, 0) == -1)
+      {
+        ilog("Child process ended\n");
+        exit(0);
+      }
       dlog("Waiting for input\n");
       int len = read(fdtail[FD_READ_END], buffer, sizeof(buffer));
 
@@ -215,6 +220,11 @@ int main(int argc, char * argv[])
       if (len == -1)
         perror("Parent read");
 
+      if (len == 0)
+      {
+        dlog("Skipping empty payload\n");
+        continue;
+      }
       dlog("Length: %d\n", len);
       dlog("Attempting to write: %s", buffer);
       plog("%s", buffer);
