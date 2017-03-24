@@ -1,3 +1,3 @@
 language: c
 script:
-  - make test TEST_OPTS=-v
+  - make test

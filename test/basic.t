@@ -18,17 +18,14 @@ test_expect_success 'should exit when child exits' "
       (>&2 echo [child] still alive)
       if [ \"\$line\" -gt 9 ]; then
         (>&2 echo [child] is closing)
-        exec 0<&-
-        exec 1>&-
         exit 0
-        (>&2 echo [child] exit is not working)
       fi
       (>&2 echo [child] printing)
       echo \"\$((line + 1))\"
     done' &
   ps && echo \"\$!\" &&
-  sleep 4 &&
-  echo \"after sleep\"
+  sleep 2 &&
+  echo \"[child] after sleep\"
   ps &&
   ! kill \"\$!\"
 "
@@ -37,8 +34,6 @@ test_expect_success '--quiet should not output anything' "
   nfcycler --quiet 'echo 1 && while read line
     do
       if [ \"\$line\" -gt 9 ]; then
-        exec 0<&-
-        exec 1>&-
         exit 0
       fi
       echo \"\$((line + 1))\"
@@ -46,39 +41,18 @@ test_expect_success '--quiet should not output anything' "
   test_line_count = 0 should-be-empty
 "
 
-# test_expect_success 'this test should not hang' "
-#   echo \"hi. beginning the hang\" &&
-#   echo \"about to write seq 1000 > expected\" &&
-#   seq 1000 > expected &&
-#   echo \"about to start nfcycler\" &&
-#   nfcycler --print-payload 'echo 1 &&
-#     while read line
-#     do
-#       if [ \"\$line\" -gt 999 ]; then
-#         exec 0<&-
-#         exec 1>&-
-#         exit 0
-#       fi
-#       echo \"\$((line + 1))\"
-#     done' >actual &&
-#   echo \"about to test_cmp\" &&
-#   test_cmp actual expected
-# "
-
-# test_expect_success '--print-payload should stdout the right output' "
-#   seq 1000 > expected &&
-#   nfcycler --print-payload 'echo 1 &&
-#     while read line
-#     do
-#       if [ \"\$line\" -gt 999 ]; then
-#         exec 0<&-
-#         exec 1>&-
-#         exit 0
-#       fi
-#       echo \"\$((line + 1))\"
-#     done' >actual &&
-#   test_cmp actual expected
-# "
+test_expect_success '--print-payload should stdout the right output' "
+  seq 1000 > expected &&
+  nfcycler --print-payload 'echo 1 &&
+    while read line
+    do
+      if [ \"\$line\" -gt 999 ]; then
+        exit 0
+      fi
+      echo \"\$((line + 1))\"
+    done' >actual &&
+  test_cmp actual expected
+"
 
 test_done
 
