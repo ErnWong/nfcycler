@@ -54,6 +54,25 @@ test_expect_success '--print-payload should stdout the right output' "
   test_cmp actual expected
 "
 
+test_expect_success '--init: empty arg should complain correctly' "
+  echo '--init <command> argument required' >expected &&
+  nfcycler --init 2>actual &&
+  test_cmp actual expected
+"
+
+test_expect_success '--init should pass value correctly' "
+  seq 123 1000 > expected &&
+  nfcycler --init 'echo 123' --print-payload '
+    while read line
+    do
+      if [ \"\$line\" -gt 999 ]; then
+        exit 0
+      fi
+      echo \"\$((line + 1))\"
+    done' >actual &&
+  test_cmp actual expected
+"
+
 test_done
 
 # vi: set ft=sh :
