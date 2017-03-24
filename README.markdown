@@ -1,5 +1,7 @@
 # nfcycler
 
+[![Build Status](https://travis-ci.org/ErnWong/nfcycler.svg?branch=master)](https://travis-ci.org/ErnWong/nfcycler)
+
 Pass in a shell command, and it will help you execute it, and pipe its stdout back into stdin.
 
 ## Usage
