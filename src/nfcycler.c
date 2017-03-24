@@ -225,7 +225,7 @@ int main(int argc, char * argv[])
 
       if (len == 0)
       {
-        ilog("Pipe got closed");
+        ilog("Pipe got closed\n");
         exit(0);
       }
       dlog("\n");
