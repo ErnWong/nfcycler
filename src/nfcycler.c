@@ -219,14 +219,14 @@ int main(int argc, char * argv[])
       dlog("Waiting for input\n");
       int len = read(fdtail[FD_READ_END], buffer, sizeof(buffer));
 
-      dlog("Got input!\r");
+      dlog("Got input!\n");
       if (len == -1)
         perror("Parent read");
 
       if (len == 0)
       {
-        dlog("Skipping empty payload\r");
-        continue;
+        ilog("Pipe got closed");
+        exit(0);
       }
       dlog("\n");
       dlog("Length: %d\n", len);
