@@ -18,6 +18,8 @@ test_expect_success 'should exit when child exits' "
       (>&2 echo [child] still alive)
       if [ \"\$line\" -gt 9 ]; then
         (>&2 echo [child] is closing)
+        exec 0<&-
+        exec 1>&-
         exit 0
         (>&2 echo [child] exit is not working)
       fi
@@ -35,6 +37,8 @@ test_expect_success '--quiet should not output anything' "
   nfcycler --quiet 'echo 1 && while read line
     do
       if [ \"\$line\" -gt 9 ]; then
+        exec 0<&-
+        exec 1>&-
         exit 0
       fi
       echo \"\$((line + 1))\"
@@ -51,6 +55,8 @@ test_expect_success '--quiet should not output anything' "
 #     while read line
 #     do
 #       if [ \"\$line\" -gt 999 ]; then
+#         exec 0<&-
+#         exec 1>&-
 #         exit 0
 #       fi
 #       echo \"\$((line + 1))\"
@@ -65,6 +71,8 @@ test_expect_success '--quiet should not output anything' "
 #     while read line
 #     do
 #       if [ \"\$line\" -gt 999 ]; then
+#         exec 0<&-
+#         exec 1>&-
 #         exit 0
 #       fi
 #       echo \"\$((line + 1))\"
