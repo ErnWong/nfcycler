@@ -81,15 +81,6 @@ optPrintPayload(command_t * cmd)
   gPrintPayload = true;
 }
 
-static void
-optInit(command_t * cmd)
-{
-  UNUSED(cmd);
-  fprintf(stderr, "Sorry, --init is not supported yet\n");
-  exit(EX_UNAVAILABLE);
-}
-
-
 void parseArguments(int argc, char * argv[])
 {
   command_t cmd;
@@ -99,7 +90,6 @@ void parseArguments(int argc, char * argv[])
   command_option(&cmd, "-v", "--verbose", "be crazy and log everything", optVerbose);
   command_option(&cmd, "-q", "--quiet", "suppress informative logs", optQuiet);
   command_option(&cmd, "-p", "--print-payload", "log the pipe's value real time", optPrintPayload);
-  command_option(&cmd, "-i", "--init <command>", "supply a payload initialisation command", optInit);
   command_parse(&cmd, argc, argv);
 
   if (1 > cmd.argc)
