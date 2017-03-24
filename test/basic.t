@@ -13,7 +13,7 @@ test_expect_success 'too many arguments should exit(EX_USAGE)' "
 "
 
 test_expect_success 'should exit when child exits' "
-  nfcycler --verbose 'echo 1 && while read line
+  nfcycler 'echo 1 && while read line
     do
       (>&2 echo [child] still alive)
       if [ \"\$line\" -gt 9 ]; then
@@ -47,7 +47,7 @@ test_expect_success '--quiet should not output anything' "
 #   echo \"about to write seq 1000 > expected\" &&
 #   seq 1000 > expected &&
 #   echo \"about to start nfcycler\" &&
-#   nfcycler --print-payload --verbose 'echo 1 &&
+#   nfcycler --print-payload 'echo 1 &&
 #     while read line
 #     do
 #       if [ \"\$line\" -gt 999 ]; then

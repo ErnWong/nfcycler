@@ -179,7 +179,7 @@ int main(int argc, char * argv[])
   }
   if (childpid == 0)
   {
-    dlog("Child process created\n");
+    ilog("Child process created\n");
 
     close(fdhead[FD_WRITE_END]);
     close(fdtail[FD_READ_END]);
@@ -201,8 +201,8 @@ int main(int argc, char * argv[])
   }
   else
   {
-    dlog("Parent process is alive\n");
-    dlog("Child pid = %d\n", childpid);
+    ilog("Parent process is alive\n");
+    ilog("Child pid = %d\n", childpid);
 
     close(fdhead[FD_READ_END]);
     close(fdtail[FD_WRITE_END]);
@@ -219,15 +219,16 @@ int main(int argc, char * argv[])
       dlog("Waiting for input\n");
       int len = read(fdtail[FD_READ_END], buffer, sizeof(buffer));
 
-      dlog("Got input!\n");
+      dlog("Got input!\r");
       if (len == -1)
         perror("Parent read");
 
       if (len == 0)
       {
-        dlog("Skipping empty payload\n");
+        dlog("Skipping empty payload\r");
         continue;
       }
+      dlog("\n");
       dlog("Length: %d\n", len);
       dlog("Attempting to write: %s", buffer);
       plog("%s", buffer);
